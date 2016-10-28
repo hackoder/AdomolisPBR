@@ -34,12 +34,6 @@
                     "type": "bitmap"
                 },
                 {
-                    "file": "fonts/silkscreen.ttf",
-                    "name": "TINY7",
-                    "targetPlatforms": null,
-                    "type": "font"
-                },
-                {
                     "file": "images/background.png",
                     "name": "BACKGROUND",
                     "targetPlatforms": null,
@@ -56,18 +50,6 @@
                     "name": "MONTHS",
                     "targetPlatforms": null,
                     "type": "bitmap"
-                },
-                {
-                    "file": "fonts/BebasNeue2.ttf",
-                    "name": "BebasNeue16",
-                    "targetPlatforms": null,
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Gobold Regular.ttf",
-                    "name": "GOBOLD_12",
-                    "targetPlatforms": null,
-                    "type": "font"
                 },
                 {
                     "file": "images/tinydot.png",

@@ -22,7 +22,7 @@ static Layer *root_layer = null;
 static GRect root_layer_bounds;
 static GPoint center;
 
-static GFont  font;
+
 GBitmap *background_bitmap,
         *center_dot_bitmap,
         *steps_center_dot_bitmap,
@@ -90,7 +90,9 @@ void battery_handler(BatteryChargeState charge_state) {
   watch_battery.is_charging    = charge_state.is_charging;
   watch_battery.is_plugged     = charge_state.is_plugged;
   
-  layer_mark_dirty(root_layer);  // Update battery percentage on display
+  // Commenting out dirty since battery will update on next minute change, that's fast enough.
+  //layer_mark_dirty(root_layer);  // Update battery percentage on display
+  
   //printf("Watch Battery %s: %03d%%", watch_battery.is_charging?"Charging":watch_battery.is_plugged?"Powered":"Discharging", watch_battery.charge_percent);
 }
 
@@ -622,9 +624,6 @@ static void main_window_unload(Window *window) {
 static void init(void) {
   load_settings();
   
-  //font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_GOBOLD_12));  // Load font
-  font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_BebasNeue16));  // Load font
-
   // Listen for AppMessages
   app_message_register_inbox_received(inbox_received_handler);
   app_message_open(128, 128);
