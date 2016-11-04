@@ -25,12 +25,9 @@ static GPoint center;
 
 GBitmap *background_bitmap,
         *center_dot_bitmap,
-        *steps_center_dot_bitmap,
         *percentage_bitmap,
         *months_bitmap,
         *digits_bitmap;
-
-static int s_step_count = 0, s_step_goal = 1, s_step_average = 0;
 
 char batt_text[10] = "";
 char date_text[10] = "";
@@ -108,7 +105,6 @@ static void load_settings() {
   settings.BackgroundColor = (GColor){.argb = 0b11000110};//GColorDukeBlue;
   settings.ForegroundColor = GColorWhite;
   settings.SecondTick = false;
-  settings.StepType = 0;
 
   // Read settings from persistent storage, if they exist
   persist_read_data(SETTINGS_KEY, &settings, sizeof(settings));
@@ -121,7 +117,7 @@ static void save_settings() {
 
 // Handle the response from AppMessage
 static void inbox_received_handler(DictionaryIterator *iter, void *context) {
-  Tuple *option_seconds, *option_steptype;
+  Tuple *option_seconds;
   
 // Background Color
 //   if (bg_color_t = dict_find(iter, MESSAGE_KEY_BackgroundColor))
@@ -143,54 +139,12 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
       tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   }
 
-  // Step Type
-  if ((option_steptype = dict_find(iter, MESSAGE_KEY_StepType)))
-    settings.StepType = option_steptype->value->int32;
-
   // Save the new settings to persistent storage
   save_settings();
   
   // Update the display with the new settings
   layer_mark_dirty(root_layer);
 }
-
-
-
-// ----------------------------------------------------------------------------------------------------------------------------
-//  Step Tracking
-// ------------------------------------------------------
-// Is step data available?
-
-bool step_data_is_available() {
-  return HealthServiceAccessibilityMaskAvailable &
-    health_service_metric_accessible(HealthMetricStepCount,
-      time_start_of_today(), time(NULL));
-}
-
-// Daily step goal
-static void get_step_goal() {
-  const time_t start = time_start_of_today();
-  const time_t end = start + SECONDS_PER_DAY;
-  s_step_goal = (int)health_service_sum_averaged(HealthMetricStepCount, start, end, HealthServiceTimeScopeDaily);
-  if (s_step_goal == 0) s_step_goal = 1;
-}
-
-// Todays current step count
-static void get_step_count() {
-  s_step_count = (int)health_service_sum_today(HealthMetricStepCount);
-}
-
-static void health_handler(HealthEventType event, void *context) {
-  if(event == HealthEventSignificantUpdate) {
-    get_step_goal();
-  }
-
-  if(event != HealthEventSleepUpdate) {
-    get_step_count();
-  }
-}
-
-
 
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -387,34 +341,6 @@ static void root_layer_update(Layer *layer, GContext *ctx) {
   //draw_image(ctx, background_bitmap, 20, 20);
   //draw_image(ctx, background_bitmap, 0, 0);
   
-  
-  
-  
-  
-  
-  // =========
-  // Steps
-  // =========
-  // steps hand
-  int32_t steps_angle = 0;
-  if (settings.StepType == 0) {
-    steps_angle = TRIG_MAX_ANGLE * s_step_count / s_step_goal;
-  } else {
-    steps_angle = TRIG_MAX_ANGLE * s_step_count / settings.StepType;
-  }
-  draw_hand(ctx, steps_angle, 18, 10, (GPoint){.x = 89, .y = 130}, 2, GColorWhite);  // steps hand
-  
-  // steps center dot
-  graphics_context_set_compositing_mode(ctx, GCompOpAssign);
-  graphics_draw_bitmap_in_rect(ctx, steps_center_dot_bitmap, GRect(86, 127, 8, 8));
-  
-  
-  
-  
-  
-  
-  
-  
 
   time_t now = time(NULL);
   struct tm *t = localtime(&now); // Current Watch Time
@@ -508,7 +434,6 @@ static void main_window_load(Window *window) {
 //   background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BACKGROUND);
 //   background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BG);
   center_dot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CENTER_DOT);
-  steps_center_dot_bitmap = gbitmap_create_with_resource(RESOURCE_ID_STEPS_CENTER_DOT);
   months_bitmap = gbitmap_create_with_resource(RESOURCE_ID_MONTHS);
   percentage_bitmap = gbitmap_create_with_resource(RESOURCE_ID_PERCENTAGE);
   digits_bitmap = gbitmap_create_with_resource(RESOURCE_ID_DIGITS);
@@ -609,9 +534,6 @@ Color 15 = 0b11 01 10 11
   
   //if (settings.use_health -- or something)
   // Subscribe to health events if we can
-  if(step_data_is_available()) {
-    health_service_events_subscribe(health_handler, NULL);
-  }
 }
 
 

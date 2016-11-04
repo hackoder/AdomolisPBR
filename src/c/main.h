@@ -8,5 +8,4 @@ typedef struct ClaySettings {
   GColor BackgroundColor;
   GColor ForegroundColor;
   bool SecondTick;
-  int StepType;
 } __attribute__((__packed__)) ClaySettings;

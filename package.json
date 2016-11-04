@@ -4,19 +4,17 @@
         "pebble-clay": "^1.0.1"
     },
     "keywords": [],
-    "name": "adomolis-pbr",
+    "name": "adomolis-nosteps",
     "pebble": {
         "capabilities": [
-            "configurable",
-            "health"
+            "configurable"
         ],
-        "displayName": "Adomolis PBR",
+        "displayName": "Adomolis No Steps",
         "enableMultiJS": true,
         "messageKeys": [
             "BackgroundColor",
             "ForegroundColor",
-            "SecondTick",
-            "StepType"
+            "SecondTick"
         ],
         "projectType": "native",
         "resources": {
@@ -80,5 +78,5 @@
             "watchface": true
         }
     },
-    "version": "0.4.0"
+    "version": "0.1.0"
 }
